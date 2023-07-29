@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Settings</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <style>
+    body {
+      margin: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .result-container {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Settings</h1>
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <form id="textForm">
+          <div class="form-group">
+            <label for="textInput">Text Input:</label>
+            <textarea class="form-control" id="textInput" rows="5" placeholder="Enter your text"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+
+      <div class="col-md-6">
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="minMsSlider">Min MS:</label>
+            <input type="range" class="form-control-range" id="minMsSlider" name="minMsSlider" min="0" max="5000" step="1" value="0">
+            <span id="minMsValue">0</span>
+          </div>
+
+          <div class="form-group">
+            <label for="maxMsSlider">Max MS:</label>
+            <input type="range" class="form-control-range" id="maxMsSlider" name="maxMsSlider" min="0" max="5000" step="1" value="0">
+            <span id="maxMsValue">0</span>
+          </div>
+
+          <div class="form-group">
+            <label for="backspaceChanceSlider">Backspace Chance:</label>
+            <input type="range" class="form-control-range" id="backspaceChanceSlider" name="backspaceChanceSlider" min="0" max="100" step="1" value="0">
+            <span id="backspaceChanceValue">0</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="result-container">
+    <p id="result"></p>
+  </div>
+  
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script>
+    let url = window.location.href
+
+    function handleSubmitText(event) {
+      event.preventDefault();
+      var textValue = document.getElementById("textInput").value;
+      postData(url + "post/string", { string: textValue })
+        .then(response => {
+          console.log("Text Value:", textValue);
+          console.log("Response:", response);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+
+    function handleSubmitSettings(event) {
+      event.preventDefault();
+      var minMsValue = document.getElementById("minMsSlider").value;
+      var maxMsValue = document.getElementById("maxMsSlider").value;
+      var backspaceChanceValue = document.getElementById("backspaceChanceSlider").value;
+      var settings = {
+        "min_ms_value": parseInt(minMsValue),
+        "max_ms_value": parseInt(maxMsValue),
+        "backspace_threshold": parseInt(backspaceChanceValue)
+      };
+      console.log(settings)
+      postData(url + "post/settings", settings)
+        .then(response => {
+          console.log("Min MS:", minMsValue);
+          console.log("Max MS:", maxMsValue);
+          console.log("Backspace Chance:", backspaceChanceValue);
+          console.log("Response:", response);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+
+    async function postData(url, data) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) {
+        throw new Error("HTTP error, status = " + response.status);
+      }
+      return response.json();
+    }
+
+    document.getElementById("textForm").addEventListener("submit", handleSubmitText);
+    document.getElementById("settingsForm").addEventListener("submit", handleSubmitSettings);
+
+    document.getElementById("minMsSlider").addEventListener("input", function() {
+      document.getElementById("minMsValue").textContent = this.value;
+    });
+
+    document.getElementById("maxMsSlider").addEventListener("input", function() {
+      document.getElementById("maxMsValue").textContent = this.value;
+    });
+
+    document.getElementById("backspaceChanceSlider").addEventListener("input", function() {
+      document.getElementById("backspaceChanceValue").textContent = this.value;
+    });
+  </script>
+</body>
+</html>
