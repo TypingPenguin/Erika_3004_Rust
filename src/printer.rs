@@ -67,8 +67,9 @@ pub fn print_anything(string: &String, uart: &UartDriver, data: &MutexGuard<'_, 
     let parsed_text = parse_text(string, data);
 
     for paragraph in parsed_text {
-        for line in paragraph {
-            if data.justify {
+        for (index, line) in paragraph.iter().enumerate() {
+            //Only justify if it isn't the last line of the paragraph
+            if data.justify && paragraph.len() < index + 1 {
                 print_string_with_mistakes_and_rhythm(&justify_line(line, data), uart, data.chance_threshold_percent, data.min_ms, data.max_ms);
             } else {
                 print_string_with_mistakes_and_rhythm(&line.to_string(), uart, data.chance_threshold_percent, data.min_ms, data.max_ms);
@@ -79,32 +80,36 @@ pub fn print_anything(string: &String, uart: &UartDriver, data: &MutexGuard<'_, 
 }
 
 fn justify_line(line: &str, data: &MutexGuard<'_, Settings>) -> String {
-    let mut rng = rand::thread_rng();
+    // let mut rng = rand::thread_rng();
     let mut line = line.to_string();
-    let mut line_length = line.chars().count();
+    // let mut line_length = line.chars().count();
     let mut spaces_to_add = data.characters_per_line as usize - line_length;
+    let white_spaces = line.matches(" ").count();
 
-    while spaces_to_add > 0 {
+    //if there are no white spaces, return the line as it is
+    if white_spaces == 0 {
+        return line;
+    }
 
+    let space_to_add_per_white_space = spaces_to_add / white_spaces;
+    let mut extra_spaces = spaces_to_add % white_spaces;
+    let mut index = 0;
 
-
-        let mut spaces_to_add_this_iteration = min(rng.gen_range(1..4), spaces_to_add);
-        let mut index = 0;
-
-        while spaces_to_add_this_iteration > 0 {
-            if line.len()>index {
-                if line.chars().nth(index).unwrap() == ' ' {
-                    line.insert(index, ' ');
-                    spaces_to_add_this_iteration -= 1;
-                }
-            } else {
-                line.push(' ');
-                spaces_to_add_this_iteration -= 1;
+    //Add spaces per white space
+    //And add extra spaces if of the modulo of the division
+    //This results in an even distribution of spaces (beginning of the sentence will have larger spacing
+    // than the end of the sentence if the modulo is not 0)
+    while index < line.len() {
+        if line.chars().nth(index).unwrap() == ' ' {
+            while extra_spaces > 0 {
+                line.insert(index, ' ');
+                extra_spaces -= 1;
             }
-            index += 1;
+            for _ in 0..space_to_add_per_white_space {
+                line.insert(index, ' ');
+            }
         }
-        line_length = line.chars().count();
-        spaces_to_add = data.characters_per_line as usize - line_length;
+        index += 1;
     }
     line
 }
