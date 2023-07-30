@@ -82,7 +82,7 @@ pub fn print_anything(string: &String, uart: &UartDriver, data: &MutexGuard<'_, 
 fn justify_line(line: &str, data: &MutexGuard<'_, Settings>) -> String {
     // let mut rng = rand::thread_rng();
     let mut line = line.to_string();
-    // let mut line_length = line.chars().count();
+    let mut line_length = line.chars().count();
     let mut spaces_to_add = data.characters_per_line as usize - line_length;
     let white_spaces = line.matches(" ").count();
 
