@@ -22,7 +22,7 @@
 </head>
 <body>
   <h1>Settings</h1>
-  
+
   <div class="container">
     <div class="row">
       <div class="col-md-6">
@@ -77,11 +77,11 @@
       </div>
     </div>
   </div>
-  
+
   <div class="result-container">
     <p id="result"></p>
   </div>
-  
+
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
   <script>
     let url = window.location.href
@@ -89,6 +89,7 @@
     function handleSubmitText(event) {
       event.preventDefault();
       var textValue = document.getElementById("textInput").value;
+      console.log(textValue);
       postData(url + "post/string", { string: textValue })
         .then(response => {
           console.log("Text Value:", textValue);

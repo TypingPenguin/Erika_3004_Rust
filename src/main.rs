@@ -47,11 +47,15 @@ pub struct MyPeripherals {
 }
 
 fn main() -> Result<()> {
+    info!("Checkpoint 1: Starting up");
+
     //Initialize board
     esp_idf_sys::link_patches();
     esp_idf_svc::log::EspLogger::initialize_default();
 
     let data_settings = Arc::new(Mutex::new(Settings {
+        justify: false,
+        characters_per_line: 65,
         min_ms: 0,
         max_ms: 0,
         chance_threshold_percent: 0.0,
@@ -61,6 +65,7 @@ fn main() -> Result<()> {
         string: "".to_string(),
     }));
 
+    info!("Checkpoint 2: Starting up");
     let peripherals = Peripherals::take().unwrap();
     let sysloop = EspSystemEventLoop::take().unwrap();
 
@@ -68,6 +73,7 @@ fn main() -> Result<()> {
     let app_config = CONFIG;
     let _wifi = wifi(app_config.wifi_ssid, app_config.wifi_psk,peripherals.modem,sysloop);
 
+    info!("Checkpoint 3: Starting up");
     let data_settings_server = data_settings.clone();
     let string_to_print_server = string_to_print.clone();
 
@@ -78,7 +84,7 @@ fn main() -> Result<()> {
     //Make a Uart driver
     let uart = init_uart(peripherals.pins.gpio17, peripherals.pins.gpio16, peripherals.uart2, peripherals.pins.gpio22, peripherals.pins.gpio23);
 
-    let testString = "Butthole";
+    // let testString = "Butthole";
 
     // printer::print_string_with_mistakes_and_rhythm(testString, &uart, 0.0,0,500);
 
@@ -93,8 +99,7 @@ fn main() -> Result<()> {
             let mut string_data = string_to_print.lock().unwrap();
             if string_data.string.len() > 0 {
                 let mut data = data_settings.lock().unwrap();
-                printer::print_anything(&string_data.string, &uart, &data);
-                printer::print_string_with_mistakes_and_rhythm(&string_data.string, &uart, data.chance_threshold_percent as f32,data.min_ms,data.max_ms);
+                // printer::print_anything(&string_data.string, &uart, &data);
             }
             string_data.string = "".to_string();
         }
