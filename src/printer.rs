@@ -73,6 +73,7 @@ pub fn print_anything(string: &String, uart: &UartDriver, data: &MutexGuard<'_, 
             } else {
                 print_string_with_mistakes_and_rhythm(&line.to_string(), uart, data.chance_threshold_percent, data.min_ms, data.max_ms);
             }
+            print_string(&"\n".to_string(), uart);
         }
     }
 }
@@ -84,12 +85,20 @@ fn justify_line(line: &str, data: &MutexGuard<'_, Settings>) -> String {
     let mut spaces_to_add = data.characters_per_line as usize - line_length;
 
     while spaces_to_add > 0 {
+
+
+
         let mut spaces_to_add_this_iteration = min(rng.gen_range(1..4), spaces_to_add);
         let mut index = 0;
 
         while spaces_to_add_this_iteration > 0 {
-            if line.chars().nth(index).unwrap() == ' ' {
-                line.insert(index, ' ');
+            if line.len()>index {
+                if line.chars().nth(index).unwrap() == ' ' {
+                    line.insert(index, ' ');
+                    spaces_to_add_this_iteration -= 1;
+                }
+            } else {
+                line.push(' ');
                 spaces_to_add_this_iteration -= 1;
             }
             index += 1;

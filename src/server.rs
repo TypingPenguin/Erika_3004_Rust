@@ -110,6 +110,7 @@ pub fn server(data_settings: Arc<Mutex<Settings>>, string_to_print: Arc<Mutex<St
 fn update_string (string: &StringData,string_data: &Arc<Mutex<StringToPrint>>){
     let mut str_data = string_data.lock().unwrap();
     str_data.string = string.string.clone();
+    dbg!("Current new string:",&str_data);
 }
 
 fn update_settings (settings: &SettingsData, data_settings: &Arc<Mutex<Settings>>) {

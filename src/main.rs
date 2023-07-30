@@ -47,8 +47,6 @@ pub struct MyPeripherals {
 }
 
 fn main() -> Result<()> {
-    info!("Checkpoint 1: Starting up");
-
     //Initialize board
     esp_idf_sys::link_patches();
     esp_idf_svc::log::EspLogger::initialize_default();
@@ -65,7 +63,6 @@ fn main() -> Result<()> {
         string: "".to_string(),
     }));
 
-    info!("Checkpoint 2: Starting up");
     let peripherals = Peripherals::take().unwrap();
     let sysloop = EspSystemEventLoop::take().unwrap();
 
@@ -73,7 +70,6 @@ fn main() -> Result<()> {
     let app_config = CONFIG;
     let _wifi = wifi(app_config.wifi_ssid, app_config.wifi_psk,peripherals.modem,sysloop);
 
-    info!("Checkpoint 3: Starting up");
     let data_settings_server = data_settings.clone();
     let string_to_print_server = string_to_print.clone();
 
@@ -90,16 +86,13 @@ fn main() -> Result<()> {
 
 
     loop{
-        let mut data = data_settings.lock().unwrap();
-        info!("This is the current min_ms {}", data.min_ms);
-        drop(data);
 
         //Check if there is some data
         {
             let mut string_data = string_to_print.lock().unwrap();
             if string_data.string.len() > 0 {
                 let mut data = data_settings.lock().unwrap();
-                // printer::print_anything(&string_data.string, &uart, &data);
+                printer::print_anything(&string_data.string, &uart, &data);
             }
             string_data.string = "".to_string();
         }
