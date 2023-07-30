@@ -91,10 +91,9 @@ fn main() -> Result<()> {
         //Check if there is some data
         {
             let mut string_data = string_to_print.lock().unwrap();
-            info!("Chechpoint1");
             if string_data.string.len() > 0 {
-                info!("Checkpoint2");
                 let mut data = data_settings.lock().unwrap();
+                printer::print_anything(&string_data.string, &uart, &data);
                 printer::print_string_with_mistakes_and_rhythm(&string_data.string, &uart, data.chance_threshold_percent as f32,data.min_ms,data.max_ms);
             }
             string_data.string = "".to_string();

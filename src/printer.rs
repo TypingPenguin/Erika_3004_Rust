@@ -1,8 +1,10 @@
 use std::cmp::min;
+use std::sync::{Arc, Mutex};
 use esp_idf_hal::delay::FreeRtos;
 use esp_idf_hal::uart::UartDriver;
 use crate::dictionary::ASCII_TO_ERIKA;
 use rand::Rng;
+use crate::settings::Settings;
 
 #[derive(Debug)]
 pub struct StringToPrint {
@@ -58,4 +60,8 @@ pub fn print_string_with_mistakes_and_rhythm(string: &String, uart: &UartDriver,
         rhythm_break(min_ms,max_ms);
         print_char_mistake(&x,uart,chance_threshold_percent);
     }
+}
+
+pub fn print_anything(string: &String, uart: &UartDriver, data: &Arc<Mutex<Settings>>){
+
 }

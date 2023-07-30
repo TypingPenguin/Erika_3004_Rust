@@ -26,6 +26,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6">
+<!--        This is the input of a block of text-->
         <form id="textForm">
           <div class="form-group">
             <label for="textInput">Text Input:</label>
@@ -36,19 +37,35 @@
       </div>
 
       <div class="col-md-6">
+        <!--          Button for justified text or not-->
+        <div class="text-center">
+          <button id="justifiedBtn" class="btn btn-primary">Justify</button>
+        </div>
+
         <form id="settingsForm">
+
+          <!--          This controls the amount of characters per line-->
+          <div class="form-group">
+            <label for="charactersPerLineSlider">Characters Per Line:</label>
+            <input type="range" class="form-control-range" id="charactersPerLineSlider" name="charactersPerLineSlider" min="0" max="200" step="1" value="65">
+            <span id="charactersPerLineValue">65</span>
+          </div>
+
+<!--          This controls the minimum amount of time between characters that are written-->
           <div class="form-group">
             <label for="minMsSlider">Min MS:</label>
             <input type="range" class="form-control-range" id="minMsSlider" name="minMsSlider" min="0" max="5000" step="1" value="0">
             <span id="minMsValue">0</span>
           </div>
 
+<!--          This controls the maximum amount of time between characters that are written-->
           <div class="form-group">
             <label for="maxMsSlider">Max MS:</label>
             <input type="range" class="form-control-range" id="maxMsSlider" name="maxMsSlider" min="0" max="5000" step="1" value="0">
             <span id="maxMsValue">0</span>
           </div>
 
+<!--          This controls the amount of chance we have to have to use the backspace-->
           <div class="form-group">
             <label for="backspaceChanceSlider">Backspace Chance:</label>
             <input type="range" class="form-control-range" id="backspaceChanceSlider" name="backspaceChanceSlider" min="0" max="100" step="1" value="0">
@@ -84,10 +101,13 @@
 
     function handleSubmitSettings(event) {
       event.preventDefault();
+      var charactersPerLineValue = document.getElementById("charactersPerLineSlider").value;
       var minMsValue = document.getElementById("minMsSlider").value;
       var maxMsValue = document.getElementById("maxMsSlider").value;
       var backspaceChanceValue = document.getElementById("backspaceChanceSlider").value;
       var settings = {
+        "justify": isJustified,
+        "characters_per_line": parseInt(charactersPerLineValue),
         "min_ms_value": parseInt(minMsValue),
         "max_ms_value": parseInt(maxMsValue),
         "backspace_threshold": parseInt(backspaceChanceValue)
@@ -95,6 +115,8 @@
       console.log(settings)
       postData(url + "post/settings", settings)
         .then(response => {
+          console.log("Justified:", isJustified)
+          console.log("Characters per line:", charactersPerLineValue);
           console.log("Min MS:", minMsValue);
           console.log("Max MS:", maxMsValue);
           console.log("Backspace Chance:", backspaceChanceValue);
@@ -119,8 +141,30 @@
       return response.json();
     }
 
+    let isJustified = false;
+
+    document.getElementById("justifiedBtn").addEventListener("click", function() {
+      isJustified = !isJustified; // toggle the state
+      if(isJustified) {
+        // apply justified alignment logic here, for example:
+        // document.body.style.textAlign = 'justify';
+        this.textContent = 'Unjustify Text';
+        this.className = 'btn btn-danger';
+      } else {
+        // apply normal alignment logic here, for example:
+        // document.body.style.textAlign = 'left';
+        this.textContent = 'Justify Text';
+        this.className = 'btn btn-primary';
+      }
+    });
+
+
     document.getElementById("textForm").addEventListener("submit", handleSubmitText);
     document.getElementById("settingsForm").addEventListener("submit", handleSubmitSettings);
+
+    document.getElementById("charactersPerLineSlider").addEventListener("input", function() {
+      document.getElementById("charactersPerLineValue").textContent = this.value;
+    });
 
     document.getElementById("minMsSlider").addEventListener("input", function() {
       document.getElementById("minMsValue").textContent = this.value;
